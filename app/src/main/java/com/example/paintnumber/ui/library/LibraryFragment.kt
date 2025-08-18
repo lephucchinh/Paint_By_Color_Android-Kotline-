@@ -22,6 +22,8 @@ import android.util.Log
 import android.widget.Toast
 import java.io.File
 import com.example.paintnumber.data.models.PaintImage
+import com.google.android.material.tabs.TabLayoutMediator
+import com.example.paintnumber.utils.ThemeManager
 
 class LibraryFragment : Fragment() {
     
@@ -38,6 +40,8 @@ class LibraryFragment : Fragment() {
     }
     private lateinit var bannerAdapter: BannerAdapter
     private lateinit var imageAdapter: ImageAdapter
+    private var bannerAutoScrollRunnable: Runnable? = null
+    private var bannerAutoScrollIntervalMs: Long = 3500
 
     private val categories = listOf(
         "Mới",
@@ -70,6 +74,7 @@ class LibraryFragment : Fragment() {
         setupBannerViewPager()
         setupTabLayout()
         setupRecyclerView()
+        setupThemeToggle()
         observeViewModel()
     }
 
@@ -87,6 +92,37 @@ class LibraryFragment : Fragment() {
                 }
             }
         }
+
+        // Attach indicator to ViewPager2
+        TabLayoutMediator(binding.bannerIndicator, binding.bannerViewPager) { _, _ -> }.attach()
+
+        // Auto-scroll
+        bannerAutoScrollRunnable = Runnable {
+            val vp = binding.bannerViewPager
+            val count = bannerAdapter.itemCount
+            if (count > 1) {
+                val next = (vp.currentItem + 1) % count
+                vp.setCurrentItem(next, true)
+            }
+            // schedule next
+            vp.postDelayed(bannerAutoScrollRunnable!!, bannerAutoScrollIntervalMs)
+        }
+    }
+
+    private fun setupThemeToggle() {
+        binding.themeToggleButton.setOnClickListener {
+            ThemeManager.toggleTheme(requireContext())
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        bannerAutoScrollRunnable?.let { binding.bannerViewPager.postDelayed(it, bannerAutoScrollIntervalMs) }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        bannerAutoScrollRunnable?.let { binding.bannerViewPager.removeCallbacks(it) }
     }
 
     private fun setupTabLayout() {

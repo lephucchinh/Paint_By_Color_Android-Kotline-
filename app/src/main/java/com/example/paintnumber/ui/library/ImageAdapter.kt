@@ -57,11 +57,19 @@ class ImageAdapter(
                 binding.completionCheckmark.visibility = View.GONE
             }
 
-            // Hiển thị tag đặc biệt nếu category là "Đặc biệt"
-            binding.specialTag.visibility = if (image.category == "Đặc biệt") {
-                View.VISIBLE
-            } else {
-                View.GONE
+            // Hiển thị badge theo category
+            when (image.category) {
+                "Đặc biệt" -> {
+                    binding.specialTag.visibility = View.VISIBLE
+                    binding.specialTag.text = "Special"
+                }
+                "Mới" -> {
+                    binding.specialTag.visibility = View.VISIBLE
+                    binding.specialTag.text = "New"
+                }
+                else -> {
+                    binding.specialTag.visibility = View.GONE
+                }
             }
 
             binding.root.setOnClickListener { onItemClick(image) }

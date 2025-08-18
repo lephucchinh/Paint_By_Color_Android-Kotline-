@@ -1,6 +1,7 @@
 package com.example.paintnumber
 
 import android.app.Application
+import com.example.paintnumber.utils.ThemeManager
 
 /**
  * Class Application chính của ứng dụng.
@@ -10,5 +11,6 @@ import android.app.Application
 class PaintByNumberApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        ThemeManager.applySavedTheme(this)
     }
 } 

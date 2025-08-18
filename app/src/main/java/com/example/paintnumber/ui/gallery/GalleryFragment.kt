@@ -13,7 +13,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class GalleryFragment : Fragment() {
     private var _binding: FragmentGalleryBinding? = null
-    private val binding get() = _binding!!
+    private val binding: FragmentGalleryBinding get() = _binding!!
     private val viewModel: GalleryViewModel by viewModels()
 
     override fun onCreateView(
@@ -28,6 +28,12 @@ class GalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViewPager()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh data so newly completed images show up immediately
+        viewModel.refreshImages()
     }
 
     private fun setupViewPager() {

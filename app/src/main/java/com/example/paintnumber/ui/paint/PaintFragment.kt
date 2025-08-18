@@ -68,7 +68,7 @@ class PaintFragment : Fragment(), PaintCanvasView.OnPaintingCompletedListener, P
         binding.paintCanvas.onPaintingCompletedListener = this
         binding.paintCanvas.onColorCompletedListener = this
 
-        // Xử lý nút back
+        // Nút back
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 showExitConfirmationDialog()
@@ -76,10 +76,13 @@ class PaintFragment : Fragment(), PaintCanvasView.OnPaintingCompletedListener, P
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
-        // Setup back button
+        // Back button
         binding.backButton.setOnClickListener {
             showExitConfirmationDialog()
         }
+
+        // Set a friendly fixed title instead of template name
+        binding.templateName.text = getString(R.string.paint_screen_title)
 
         // Load template và progress
         loadTemplateAndProgress()
@@ -131,8 +134,8 @@ class PaintFragment : Fragment(), PaintCanvasView.OnPaintingCompletedListener, P
                         Log.d(TAG, "Template loaded successfully with ${template.regions.size} regions")
                         Log.d(TAG, "Template dimensions: ${template.width}x${template.height}")
                         
-                        // Update template name
-                        binding.templateName.text = template.name
+                        // Keep using friendly title, do not override with template.name
+                        // binding.templateName.text = template.name
                         
                         // Set the template for color regions first
                         binding.paintCanvas.setTemplate(template)
@@ -262,6 +265,9 @@ class PaintFragment : Fragment(), PaintCanvasView.OnPaintingCompletedListener, P
 
                 // Lưu trạng thái hoàn thành vào SharedPreferences
                 completedPaintingsManager.markAsCompleted(args.imageId, imageFile.absolutePath)
+                
+                // Xóa tiến trình nếu còn lưu để tránh hiển thị ở tab Trong tiến trình
+                completedPaintingsManager.removeProgress(args.imageId)
 
                 withContext(Dispatchers.Main) {
                     // Chuyển đến màn hình congratulation

@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.paintnumber.databinding.FragmentGalleryListBinding
 import com.example.paintnumber.ui.library.ImageAdapter
+import android.util.Log
 
 class GalleryInProgressFragment : Fragment() {
     private var _binding: FragmentGalleryListBinding? = null
@@ -35,26 +36,40 @@ class GalleryInProgressFragment : Fragment() {
 
     private fun setupRecyclerView() {
         imageAdapter = ImageAdapter { paintImage ->
-            // Lấy ID ảnh từ đường dẫn file
-            val imageId = paintImage.id
+            val fullId = paintImage.id // e.g., "image_3"
+            val numberPart = fullId.substringAfter("image_") // "3"
             val context = requireContext()
-            
-            // Tìm resource ID cho ảnh outline và svg
-            val outlineResId = context.resources.getIdentifier(
-                "${imageId}_line_art",
+
+            val outlineName = "image_${numberPart}_line_art"
+            val svgName = "image_${numberPart}"
+
+            var outlineResId = context.resources.getIdentifier(
+                outlineName,
                 "raw",
                 context.packageName
             )
-            val svgResId = context.resources.getIdentifier(
-                imageId,
+            var svgResId = context.resources.getIdentifier(
+                svgName,
                 "raw",
                 context.packageName
+            )
+
+            // Extra fallback: try resolving svg by fullId as-is
+            if (svgResId == 0) {
+                svgResId = context.resources.getIdentifier(fullId, "raw", context.packageName)
+            }
+            // Fallback for outline from model
+            if (outlineResId == 0 && paintImage.outlineResId != 0) outlineResId = paintImage.outlineResId
+
+            Log.d(
+                "GalleryInProgressFragment",
+                "Resolve resources id=$fullId outlineName=$outlineName -> $outlineResId, svgName=$svgName -> $svgResId"
             )
 
             if (outlineResId != 0 && svgResId != 0) {
                 findNavController().navigate(
                     GalleryFragmentDirections.actionGalleryToSketchLoading(
-                        imageId = imageId,
+                        imageId = fullId,
                         lineArtResId = outlineResId,
                         svgResId = svgResId,
                         progressPath = paintImage.progressPath

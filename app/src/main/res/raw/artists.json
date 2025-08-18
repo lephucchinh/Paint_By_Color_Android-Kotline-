@@ -1,0 +1,32 @@
+[
+  {
+    "id": "auth_grimm",
+    "name": "Sylvie Delacroix",
+    "avatarResName": "artist_1",
+    "bio": "Họa sĩ minh họa hiện đại, thích phong cách cổ tích."
+  },
+  {
+    "id": "auth_local",
+    "name": "Lyra Wells",
+    "avatarResName": "artist_2",
+    "bio": "Khám phá cảm xúc bằng đường nét tinh tế."
+  },
+  {
+    "id": "auth_helmi",
+    "name": "Helmi Järvinen",
+    "avatarResName": "artist_3",
+    "bio": "Truyền tải thiên nhiên Bắc Âu vào từng bức vẽ."
+  },
+  {
+    "id": "auth_bessie",
+    "name": "Bessie Rapson",
+    "avatarResName": "artist_4",
+    "bio": "Kể chuyện bằng hình với chủ đề fantasy."
+  },
+  {
+    "id": "auth_yumi",
+    "name": "Yumi Fujimoto",
+    "avatarResName": "artist_5",
+    "bio": "Phong cách anime mềm mại và tươi sáng."
+  }
+]

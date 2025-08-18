@@ -23,12 +23,44 @@
     <fragment
         android:id="@+id/navigation_artist"
         android:name="com.example.paintnumber.ui.artist.ArtistFragment"
-        android:label="Nghệ sĩ" />
+        android:label="Nghệ sĩ" >
+        <action
+            android:id="@+id/action_artist_to_artistDetail"
+            app:destination="@id/artistDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_daily"
         android:name="com.example.paintnumber.ui.daily.DailyFragment"
-        android:label="Hàng ngày" />
+        android:label="Hàng ngày" >
+        <action
+            android:id="@+id/action_daily_to_sketch_loading"
+            app:destination="@id/navigation_sketch_loading" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/artistDetailFragment"
+        android:name="com.example.paintnumber.ui.artist.ArtistDetailFragment"
+        android:label="Artist Detail">
+        <argument
+            android:name="artistId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_artistDetail_to_story"
+            app:destination="@id/storyFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/storyFragment"
+        android:name="com.example.paintnumber.ui.artist.StoryFragment"
+        android:label="Story">
+        <argument
+            android:name="artworkId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_story_to_sketch_loading"
+            app:destination="@id/navigation_sketch_loading" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_gallery"

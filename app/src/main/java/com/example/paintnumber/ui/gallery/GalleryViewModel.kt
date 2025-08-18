@@ -10,6 +10,7 @@ import com.example.paintnumber.data.CompletedPaintingsManager
 import com.example.paintnumber.data.models.PaintImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 class GalleryViewModel(application: Application) : AndroidViewModel(application) {
     private val completedPaintingsManager = CompletedPaintingsManager(application)
@@ -29,20 +30,24 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch(Dispatchers.IO) {
             val allImages = getAllImages()
             val (completed, notCompleted) = allImages.partition { it.isCompleted }
-            val (inProgress, notStarted) = notCompleted.partition { 
+
+            // Build in-progress from remaining
+            val (inProgress, _) = notCompleted.partition {
                 completedPaintingsManager.isInProgress(it.id)
             }
 
-            // Cập nhật đường dẫn cho các ảnh đang trong tiến trình
-            val updatedInProgress = inProgress.map { image ->
-                image.copy(
-                    progressPath = completedPaintingsManager.getProgressPath(image.id),
-                    isInProgress = true
-                )
-            }
-            
+            // Remove any in-progress that are already completed (extra safety)
+            val completedIds = completed.map { it.id }.toSet()
+            val filteredInProgress = inProgress.filter { it.id !in completedIds }
+                .map { image ->
+                    image.copy(
+                        progressPath = completedPaintingsManager.getProgressPath(image.id),
+                        isInProgress = true
+                    )
+                }
+
             _completedImages.postValue(completed)
-            _inProgressImages.postValue(updatedInProgress)
+            _inProgressImages.postValue(filteredInProgress)
         }
     }
 
@@ -71,25 +76,28 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
                     context.packageName
                 )
                 
-            images.add(
-                PaintImage(
-                        id = "image_$imageNumber",
+                images.add(
+                    PaintImage(
+                        id = "image_${imageNumber}",
                         previewResId = previewResId,
                         outlineResId = outlineResId,
-                    category = "Completed",
-                    isCompleted = true,
+                        category = "Completed",
+                        isCompleted = true,
                         completedImagePath = imagePath,
                         isInProgress = false
+                    )
                 )
-            )
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading completed image: ${e.message}")
             }
         }
         
-        // Xử lý các ảnh đang trong tiến trình
+        // Xử lý các ảnh đang trong tiến trình (bỏ qua file không tồn tại)
         inProgressPaintings.forEach { imagePath ->
             try {
+                val file = File(imagePath)
+                if (!file.exists()) return@forEach
+
                 val fileName = imagePath.substringAfterLast("/").substringBeforeLast(".")
                 val imageNumber = fileName.substringBefore("_progress").substringAfter("image_")
                 
@@ -107,7 +115,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
                 
                 images.add(
                     PaintImage(
-                        id = "image_$imageNumber",
+                        id = "image_${imageNumber}",
                         previewResId = previewResId,
                         outlineResId = outlineResId,
                         category = "In Progress",

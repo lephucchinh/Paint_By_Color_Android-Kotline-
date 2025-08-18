@@ -32,7 +32,7 @@ class ColorPaletteAdapter(
             selectedPosition = holder.adapterPosition
 
             // Cập nhật UI
-            notifyItemChanged(previousPosition)
+            if (previousPosition != RecyclerView.NO_POSITION) notifyItemChanged(previousPosition)
             notifyItemChanged(selectedPosition)
 
             // Gọi callback với màu và số được chọn
@@ -42,7 +42,7 @@ class ColorPaletteAdapter(
 
     inner class ColorViewHolder(private val binding: ItemColorBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: PaintColor, isSelected: Boolean) {
-            // Set color
+            // Set color once
             binding.colorView.setCardBackgroundColor(item.color)
             
             // Set number
@@ -56,10 +56,10 @@ class ColorPaletteAdapter(
             val brightness = (r * 299 + g * 587 + b * 114) / 1000
             binding.numberText.setTextColor(if (brightness > 128) Color.BLACK else Color.WHITE)
             
-            // Handle selection state
+            // Handle selection state with stroke and elevation
             binding.colorView.cardElevation = if (isSelected) 8f else 2f
-            binding.colorView.setStrokeWidth(if (isSelected) 2 else 0)
-            binding.colorView.setCardBackgroundColor(item.color)
+            binding.colorView.strokeWidth = if (isSelected) 3 else 0
+            binding.colorView.strokeColor = if (brightness > 128) Color.BLACK else Color.WHITE
         }
     }
 
